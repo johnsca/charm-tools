@@ -331,8 +331,11 @@ class LayerYAML(YAMLTactic):
     def trigger(cls, relpath):
         return relpath in cls.FILENAMES
 
-    def read(self):
-        self._raw_data = self.load(self.entity.open())
+    def combine(self, existing):
+        prev = existing._raw_data or existing.load(existing.entity.open()) or {}
+        next = self.load(self.entity.open()) or {}
+        self._raw_data = utils.deepmerge(prev, next)
+        return self
 
     def __call__(self):
         # rewrite includes to be the current source
